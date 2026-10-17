@@ -32,7 +32,7 @@ await build({ ...common, entryPoints: ['src/preload.ts'], outfile: 'dist/preload
 // Bundle the MCP server for embedding in the Electron app
 await build({
   ...common,
-  entryPoints: ['../mcp-server/src/server.ts'],
+  entryPoints: ['./mcp-server/src/server.ts'],
   outfile: 'dist/mcp-server.cjs',
   // MCP server needs these as externals since they're ESM-only
   external: ['electron', '@modelcontextprotocol/sdk', ...NATIVE_EXTERNALS],
