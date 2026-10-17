@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  // Tests are run by vitest from source; they must not land in dist.
+  "exclude": ["src/**/__tests__/**", "src/**/*.test.ts"]
+}

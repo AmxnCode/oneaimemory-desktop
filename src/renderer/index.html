@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:;" />
+<title>OneAIMemory</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Reusable icon sprite. Inline so the CSP needs no external origins. -->
+<svg class="sprite" aria-hidden="true">
+  <defs>
+    <g id="i-logo" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="8" cy="8" r="2.1"/><path d="M8 1.4v2.4M8 12.2v2.4M1.4 8h2.4M12.2 8h2.4"/>
+      <path d="M3.4 3.4l1.7 1.7M10.9 10.9l1.7 1.7M12.6 3.4l-1.7 1.7M5.1 10.9l-1.7 1.7" opacity=".55"/>
+    </g>
+    <g id="i-timeline" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+      <path d="M5.5 3h8M5.5 8h8M5.5 13h8"/><circle cx="2.6" cy="3" r="1.1"/><circle cx="2.6" cy="8" r="1.1"/><circle cx="2.6" cy="13" r="1.1"/>
+    </g>
+    <g id="i-gauge" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2.3 12a6.4 6.4 0 1111.4 0"/><path d="M8 12l3-3.4"/><circle cx="8" cy="12" r=".9" fill="currentColor" stroke="none"/>
+    </g>
+    <g id="i-shield" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 1.6l5.2 2v4.1c0 3-2.1 5.7-5.2 6.7-3.1-1-5.2-3.7-5.2-6.7V3.6z"/><path d="M5.9 7.9l1.5 1.5 2.9-2.9"/>
+    </g>
+    <g id="i-browser" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.8"/><path d="M1.8 6h12.4"/><circle cx="4" cy="4.4" r=".55" fill="currentColor" stroke="none"/>
+    </g>
+    <g id="i-robot" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2.6" y="5" width="10.8" height="8" rx="2"/><path d="M8 2.2V5"/><circle cx="8" cy="2" r=".9"/><path d="M6 8.6v1M10 8.6v1"/>
+    </g>
+    <g id="i-log" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2.5" y="1.8" width="11" height="12.4" rx="1.6"/><path d="M5.2 5.4h5.6M5.2 8h5.6M5.2 10.6h3.4"/>
+    </g>
+    <g id="i-globe" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4"/><ellipse cx="8" cy="8" rx="2.6" ry="6.2"/>
+    </g>
+    <g id="i-search" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/>
+    </g>
+    <g id="i-play" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1.6" y="3.2" width="12.8" height="9.6" rx="2.2"/><path d="M6.6 6.3l3.6 1.9-3.6 1.9z"/>
+    </g>
+    <g id="i-window" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.8"/><path d="M1.8 6h12.4"/>
+    </g>
+    <g id="i-code" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5.4 5.2L2.4 8l3 2.8M10.6 5.2L13.6 8l-3 2.8M9.2 3.4l-2.4 9.2"/>
+    </g>
+    <g id="i-file" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 1.8H4.6a1.6 1.6 0 00-1.6 1.6v9.2a1.6 1.6 0 001.6 1.6h6.8a1.6 1.6 0 001.6-1.6V5.4z"/><path d="M9 1.8v3.6h3.6"/>
+    </g>
+    <g id="i-trash" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2.8 4.2h10.4M6 4.2V2.9a.9.9 0 01.9-.9h2.2a.9.9 0 01.9.9v1.3M4.3 4.2l.6 8.6a1.2 1.2 0 001.2 1.1h3.8a1.2 1.2 0 001.2-1.1l.6-8.6"/>
+    </g>
+    <g id="i-refresh" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13.6 6.8a5.8 5.8 0 10-.5 4.2"/><path d="M13.9 2.9v3.9H10"/>
+    </g>
+    <g id="i-lock" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.2" y="7" width="9.6" height="7" rx="1.8"/><path d="M5.6 7V4.9a2.4 2.4 0 014.8 0V7"/>
+    </g>
+    <g id="i-finger" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2.6 6.4a6.4 6.4 0 0110.8-1.9"/><path d="M4.9 8a3.2 3.2 0 016.3-.6"/><path d="M8 8v2.2a3 3 0 003 3"/>
+      <path d="M13.6 7.6v1.6a5.6 5.6 0 01-1.4 3.7"/><path d="M5 11.4a5.6 5.6 0 01-.9-3.1"/><path d="M7.6 13.8a3 3 0 01-1.3-.8"/>
+    </g>
+    <g id="i-info" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="8" cy="8" r="6.3"/><path d="M8 7.4v3.6"/><circle cx="8" cy="5.2" r=".85" fill="currentColor" stroke="none"/>
+    </g>
+    <g id="i-alert" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 1.9l6.4 11.2H1.6z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.3" r=".85" fill="currentColor" stroke="none"/>
+    </g>
+    <g id="i-inbox" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1.9 8.6h3.4l1 1.9h3.4l1-1.9h3.4"/><path d="M3.4 2.9h9.2l1.5 5.7v3.4a1.6 1.6 0 01-1.6 1.6H3.5a1.6 1.6 0 01-1.6-1.6V8.6z"/>
+    </g>
+    <g id="i-logout" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6.2 13.6H3.6A1.6 1.6 0 012 12V4a1.6 1.6 0 011.6-1.6h2.6M10.4 11.2L13.6 8l-3.2-3.2M13.6 8H6.2"/>
+    </g>
+    <g id="i-folder" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1.9 4.4a1.5 1.5 0 011.5-1.5h2.4l1.4 1.7h5a1.5 1.5 0 011.5 1.5v5.6a1.5 1.5 0 01-1.5 1.5H3.4a1.5 1.5 0 01-1.5-1.5z"/>
+    </g>
+    <g id="i-copy" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5.4" y="5.4" width="8.2" height="8.2" rx="1.5"/><path d="M10.6 5.4V3.9a1.5 1.5 0 00-1.5-1.5H3.9a1.5 1.5 0 00-1.5 1.5v5.2a1.5 1.5 0 001.5 1.5h1.5"/>
+    </g>
+    <g id="i-graph" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.2 4.2l3.6 4M11.6 4.6l-3.6 3.8M4.4 11.4l3.4-3.4"/>
+      <circle cx="3.6" cy="3.6" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="12.2" cy="3.9" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="3.7" cy="12.2" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="9.5" cy="9.2" r="1.6" fill="currentColor" stroke="none"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ================================================ SIGN IN ============== -->
+<div id="auth" class="screen hidden">
+  <div class="screen-box">
+    <div class="screen-brand">
+      <div class="brand-mark"><svg viewBox="0 0 16 16"><use href="#i-logo"/></svg></div>
+      <h1>OneAIMemory</h1>
+      <p>Cross-device context, encrypted on this Mac</p>
+    </div>
+
+    <div class="screen-card">
+      <label class="field"><span>Email</span><input id="email" type="email" placeholder="you@example.com" /></label>
+      <label class="field"><span>Account password</span><input id="password" type="password" placeholder="at least 10 characters" /></label>
+      <label class="field">
+        <span>Encryption passphrase</span>
+        <input id="passphrase" type="password" placeholder="must differ from your password" />
+      </label>
+
+      <div class="callout warn gap-callout">
+        <svg viewBox="0 0 16 16"><use href="#i-alert"/></svg>
+        <div>
+          The passphrase encrypts your activity and never leaves this Mac. It must differ from
+          your account password — the server receives that, so if they matched it could derive
+          your key. <strong>There is no recovery.</strong>
+        </div>
+      </div>
+
+      <button id="btnLogin" class="primary block">Sign in</button>
+      <div class="divider"><span>first time here?</span></div>
+      <button id="btnRegister" class="block">Create account</button>
+      <div class="err-box" id="authError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================ LOCKED =============== -->
+<div id="locked" class="screen hidden">
+  <div class="screen-box">
+    <div class="screen-brand">
+      <div class="brand-mark"><svg viewBox="0 0 16 16"><use href="#i-lock"/></svg></div>
+      <h1>Locked</h1>
+      <p id="lockedWho">—</p>
+    </div>
+
+    <div class="screen-card">
+      <button id="btnTouchId" class="primary block">
+        <svg viewBox="0 0 16 16"><use href="#i-finger"/></svg> Unlock with Touch ID
+      </button>
+      <div class="divider"><span>or</span></div>
+      <input id="lockPassphrase" type="password" placeholder="Encryption passphrase" />
+      <button id="btnPassUnlock" class="block mt-sm">Unlock with passphrase</button>
+      <div class="err-box" id="lockError"></div>
+      <p class="note mt-md">
+        Collection is paused while locked. Touch ID gates access to the passphrase in your
+        Keychain — a presence check, not extra encryption.
+      </p>
+    </div>
+    <div class="screen-foot"><button id="btnLockedSignOut" class="ghost sm">Sign out</button></div>
+  </div>
+</div>
+
+<!-- ================================================ MAIN ================= -->
+<div id="main" class="app hidden">
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 16 16"><use href="#i-logo"/></svg></div>
+      <div>
+        <div class="brand-name">OneAIMemory</div>
+        <div class="brand-sub" id="brandStatus">—</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Workspace</div>
+    <button class="nav-item active" data-tab="activity"><svg viewBox="0 0 16 16"><use href="#i-timeline"/></svg> Activity</button>
+    <button class="nav-item" data-tab="status"><svg viewBox="0 0 16 16"><use href="#i-gauge"/></svg> Status</button>
+    <button class="nav-item" data-tab="privacy"><svg viewBox="0 0 16 16"><use href="#i-shield"/></svg> Privacy</button>
+    <button class="nav-item" data-tab="browser"><svg viewBox="0 0 16 16"><use href="#i-browser"/></svg> Browser</button>
+    <button class="nav-item" data-tab="ai"><svg viewBox="0 0 16 16"><use href="#i-robot"/></svg> AI access</button>
+    <button class="nav-item" data-tab="memory"><svg viewBox="0 0 16 16"><use href="#i-graph"/></svg> Memory</button>
+    <button class="nav-item" data-tab="audit"><svg viewBox="0 0 16 16"><use href="#i-log"/></svg> Audit</button>
+
+    <div class="sidebar-foot">
+      <div class="account">
+        <div class="avatar" id="avatar">?</div>
+        <span id="accountEmail">—</span>
+      </div>
+      <button class="nav-item" id="btnSignOut"><svg viewBox="0 0 16 16"><use href="#i-logout"/></svg> Sign out</button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- ACTIVITY -->
+      <section data-panel="activity">
+        <div class="page-head">
+          <div>
+            <h1>Activity</h1>
+            <p>Everything recorded about you, decrypted on this Mac.</p>
+          </div>
+          <div class="spacer"></div>
+          <button id="btnRefreshActivity" class="ghost" title="Refresh"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></button>
+        </div>
+
+        <div class="segmented mb-md" id="typeFilters">
+          <button class="filter on" data-type="">All</button>
+          <button class="filter" data-type="browsing">Browsing</button>
+          <button class="filter" data-type="search">Searches</button>
+          <button class="filter" data-type="youtube">YouTube</button>
+          <button class="filter" data-type="app">Apps</button>
+          <button class="filter" data-type="code">Code</button>
+        </div>
+
+        <div class="card"><div class="card-body flush"><div id="activityFeed" class="feed scroll">Loading…</div></div></div>
+
+        <div class="card">
+          <div class="card-head"><h2>Refused by the filter</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">
+              These never reached disk or the network. Only the reason and type are kept —
+              recording the blocked URL would recreate the data the filter just refused.
+            </p>
+            <div id="blockedFeed" class="feed mt-sm">None yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATUS -->
+      <section data-panel="status" class="hidden">
+        <div class="page-head">
+          <div><h1>Status</h1><p id="deviceLine">—</p></div>
+          <div class="spacer"></div>
+          <span class="badge" id="statusPill">—</span>
+        </div>
+
+        <div class="kpi">
+          <div class="tile"><div class="tile-label">Collected</div><div class="tile-value" id="sCollected">0</div></div>
+          <div class="tile"><div class="tile-label">Pending</div><div class="tile-value" id="sPending">0</div></div>
+          <div class="tile"><div class="tile-label">Synced</div><div class="tile-value" id="sSynced">0</div></div>
+          <div class="tile"><div class="tile-label">Blocked</div><div class="tile-value" id="sBlocked">0</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="switch-row pt-0">
+              <div class="switch-text">
+                <strong>Collection</strong>
+                <span id="pauseNote">Activity is being collected from this Mac.</span>
+              </div>
+              <div class="row-inline">
+                <button id="btnSync"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg> Sync now</button>
+                <button id="btnPause">Pause</button>
+              </div>
+            </div>
+            <div class="note mt-xs" id="syncNote">—</div>
+            <div class="switch-row" id="biometricRow">
+              <div class="switch-text">
+                <strong>Require Touch ID at launch</strong>
+                <span>Stay locked until you authenticate.</span>
+              </div>
+              <div class="row-inline">
+                <button id="btnLockNow" class="sm">Lock now</button>
+                <label class="switch"><input type="checkbox" id="requireBiometric" /><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Stored on the server</h2></div>
+          <div class="card-body flush"><div id="serverStatus" class="feed">Loading…</div></div>
+        </div>
+
+        <button id="btnDataDir" class="ghost"><svg viewBox="0 0 16 16"><use href="#i-folder"/></svg> Open data folder</button>
+      </section>
+
+      <!-- PRIVACY -->
+      <section data-panel="privacy" class="hidden">
+        <div class="page-head"><div><h1>Privacy</h1><p>What is collected, and what never is.</p></div></div>
+
+        <div class="card">
+          <div class="card-head"><h2>What gets collected</h2></div>
+          <div class="card-body">
+            <div class="switch-row pt-0">
+              <div class="switch-text"><strong>Browsing</strong><span>Active tab URL and title</span></div>
+              <label class="switch"><input type="checkbox" id="collectBrowsing" /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Search queries</strong><span>Terms parsed from search URLs</span></div>
+              <label class="switch"><input type="checkbox" id="collectSearches" /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>YouTube</strong><span>Videos you watch</span></div>
+              <label class="switch"><input type="checkbox" id="collectYoutube" /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Apps</strong><span>Which app is focused, and for how long</span></div>
+              <label class="switch"><input type="checkbox" id="collectApps" /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Editor activity</strong><span>File, language and project</span></div>
+              <label class="switch"><input type="checkbox" id="collectCode" /><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>AI session memory</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">
+              Lets OneAIMemory read your local Claude Code, Codex CLI and Gemini CLI session
+              logs, so any connected AI can pick up real context from conversations you've
+              already had elsewhere — see it under the Memory tab.
+            </p>
+            <div class="callout warn">
+              <svg viewBox="0 0 16 16"><use href="#i-alert"/></svg>
+              <div>
+                <strong>This is real conversation content, not just metadata.</strong>
+                Off by default, unlike everything else on this page. Secrets and API keys are
+                scrubbed before anything is stored or synced, but the substance of what you
+                discussed is not.
+              </div>
+            </div>
+            <div class="switch-row pt-0">
+              <div class="switch-text"><strong>Collect AI session content</strong><span>Off by default</span></div>
+              <label class="switch"><input type="checkbox" id="collectAiSessions" /><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Never collected</h2></div>
+          <div class="card-body">
+            <div class="callout">
+              <svg viewBox="0 0 16 16"><use href="#i-info"/></svg>
+              <div>
+                <strong>Enforced here, before anything is written or sent.</strong>
+                Banking and health domains, sign-in and checkout pages, API keys,
+                credit-card numbers (Luhn-checked), SSNs, JWTs, private-key paths, and OAuth
+                tokens in URLs. <span id="lastDrop"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Your blocklist</h2></div>
+          <div class="card-body">
+            <div class="row-inline">
+              <input id="newDomain" type="text" placeholder="example.com" />
+              <button id="btnAddDomain">Block domain</button>
+            </div>
+            <div class="chips" id="domainChips"></div>
+            <div class="row-inline mt-md">
+              <input id="newTerm" type="text" placeholder="term appearing in a search" />
+              <button id="btnAddTerm">Block term</button>
+            </div>
+            <div class="chips" id="termChips"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BROWSER -->
+      <section data-panel="browser" class="hidden">
+        <div class="page-head">
+          <div><h1>Browser</h1><p id="extStatus">—</p></div>
+          <div class="spacer"></div>
+          <span class="badge" id="extPill">—</span>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <p class="note mt-0">
+              This app can only read the <em>active tab</em> of a frontmost browser. The extension
+              captures every page and search, in any window — which is where most useful context lives.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Pairing token</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">
+              Paste into the extension's options. It stops arbitrary web pages posting fake
+              activity. Not an encryption key — the extension never sees your passphrase.
+            </p>
+            <div class="row-inline mt-sm">
+              <input id="extToken" type="text" readonly />
+              <button id="btnCopyToken"><svg viewBox="0 0 16 16"><use href="#i-copy"/></svg> Copy</button>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Accept events from the extension</strong><span id="extAccepted">—</span></div>
+              <label class="switch"><input type="checkbox" id="extensionEnabled" /><span class="slider"></span></label>
+            </div>
+            <button id="btnRegenToken" class="danger sm">Regenerate token</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Install it</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">Not on the Chrome Web Store yet — load it unpacked:</p>
+            <pre id="extPath">…</pre>
+            <ol class="steps">
+              <li>Open <code>chrome://extensions</code></li>
+              <li>Turn on <strong>Developer mode</strong></li>
+              <li>Click <strong>Load unpacked</strong> and pick the folder above</li>
+              <li>Open its Options and paste the token</li>
+            </ol>
+            <button id="btnRevealExt" class="ghost mt-sm">
+              <svg viewBox="0 0 16 16"><use href="#i-folder"/></svg> Reveal in Finder
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI ACCESS -->
+      <section data-panel="ai" class="hidden">
+        <div class="page-head"><div><h1>AI access</h1><p>Which tools can read your consciousness.</p></div></div>
+
+        <div class="card">
+          <div class="card-head"><h2>Embedded MCP Server</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">
+              The MCP server runs inside this app and starts automatically when you sign in.
+              AI tools connect to it via <code>~/.oneconscious/mcp.json</code> to access your activity context.
+            </p>
+            <div id="mcpStatus" class="mt-sm">Loading...</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="callout">
+              <svg viewBox="0 0 16 16"><use href="#i-info"/></svg>
+              <div>
+                <strong>Access binds to a token, not a model name.</strong> An MCP server
+                authenticates the credential it is handed — it cannot verify which AI is calling.
+                Revoking the token is the only real revocation.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Remote AI Access</h2></div>
+          <div class="card-body">
+            <p class="note mt-0">
+              For AI tools that can't run locally, like ChatGPT — they connect to
+              OneAIMemory's server over the internet instead of to this Mac.
+            </p>
+            <div class="callout warn">
+              <svg viewBox="0 0 16 16"><use href="#i-alert"/></svg>
+              <div>
+                <strong>This is different from the embedded MCP server above.</strong>
+                Turning it on sends a copy of your encryption key to OneAIMemory's
+                servers, so they can decrypt your activity to answer remote AI tools.
+                Your local AI tools (Claude, Cursor, Kiro) are not affected and stay
+                fully encrypted either way.
+              </div>
+            </div>
+            <div class="switch-row pt-0">
+              <div class="switch-text"><strong>Allow remote AI access</strong><span id="remoteAccessSubtext">Loading…</span></div>
+              <label class="switch"><input type="checkbox" id="remoteAccessToggle" /><span class="slider"></span></label>
+            </div>
+            <div class="err-box" id="remoteAccessError"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Connect another AI tool</h2></div>
+          <div class="card-body">
+            <label class="field"><span>Label</span><input id="integrationLabel" type="text" value="Claude Desktop" /></label>
+            <div class="switch-row pt-0">
+              <div class="switch-text"><strong>Summary</strong><span>Current projects and interests</span></div>
+              <label class="switch"><input type="checkbox" class="scope" value="consciousness:summary" checked /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Read activity</strong><span>Raw event history</span></div>
+              <label class="switch"><input type="checkbox" class="scope" value="activity:read" checked /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Search</strong><span>Full-text search across activity</span></div>
+              <label class="switch"><input type="checkbox" class="scope" value="activity:search" checked /><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div class="switch-text"><strong>Device status</strong><span>Which devices are syncing</span></div>
+              <label class="switch"><input type="checkbox" class="scope" value="devices:read" checked /><span class="slider"></span></label>
+            </div>
+            <button id="btnConnect" class="primary block mt-md">Generate token &amp; config</button>
+
+            <div id="connectResult" class="hidden">
+              <p class="note">Wrote <code id="configPath"></code> (mode 0600). Add to your MCP client:</p>
+              <pre id="mcpSnippet"></pre>
+              <button id="btnReveal" class="ghost mt-sm">
+                <svg viewBox="0 0 16 16"><use href="#i-folder"/></svg> Reveal in Finder
+              </button>
+            </div>
+            <div class="err-box" id="connectError"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Active tokens</h2></div>
+          <div class="card-body flush"><div id="integrationList">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- MEMORY -->
+      <section data-panel="memory" class="hidden">
+        <div class="page-head">
+          <div><h1>Memory</h1><p>Searchable map of your Claude Code, Codex and Gemini sessions.</p></div>
+          <div class="spacer"></div>
+          <button id="btnRefreshMemory" class="ghost" title="Refresh"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></button>
+        </div>
+
+        <div id="memoryOff" class="card hidden">
+          <div class="card-body">
+            <div class="callout">
+              <svg viewBox="0 0 16 16"><use href="#i-info"/></svg>
+              <div>
+                <strong>AI session memory is off.</strong>
+                Turn on <em>Collect AI session content</em> in Privacy to start building this.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="memoryOn">
+          <div class="card">
+            <div class="card-body">
+              <div class="row-inline">
+                <input id="memorySearch" type="text" placeholder="Search your AI conversations…" />
+                <button id="btnMemorySearch">Search</button>
+              </div>
+              <div id="memorySearchResults" class="feed mt-sm"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>Graph</h2>
+              <div class="spacer"></div>
+              <span class="note" id="memoryGraphCount"></span>
+            </div>
+            <div class="card-body flush">
+              <div id="memoryGraphWrap" class="graph-wrap">
+                <canvas id="memoryGraphCanvas"></canvas>
+                <div id="memoryGraphEmpty" class="empty hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card hidden" id="memoryDetailCard">
+            <div class="card-head">
+              <h2>Chunk</h2>
+              <div class="spacer"></div>
+              <button id="btnCloseMemoryDetail" class="ghost sm">Close</button>
+            </div>
+            <div class="card-body" id="memoryDetail"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIT -->
+      <section data-panel="audit" class="hidden">
+        <div class="page-head">
+          <div><h1>Audit</h1><p>Every read of your data, by you or by an AI.</p></div>
+          <div class="spacer"></div>
+          <button id="btnRefreshAudit" class="ghost" title="Refresh"><svg viewBox="0 0 16 16"><use href="#i-refresh"/></svg></button>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="callout warn">
+              <svg viewBox="0 0 16 16"><use href="#i-alert"/></svg>
+              <div>
+                <strong>The model name is self-reported and unverified.</strong> Any client with a
+                token can claim any name. The trustworthy identity is the token label.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card"><div class="card-body flush"><div id="auditList" class="feed scroll">Loading…</div></div></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Exact accent used everywhere else in the app (light #2a78d6 → dark
+         #3987e5) as a subtle diagonal gradient, not an unrelated hue. -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3987e5"/>
+      <stop offset="100%" stop-color="#215fac"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="32%" cy="24%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- macOS-style continuous corner -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#sheen)"/>
+
+  <!-- The app's own crosshair mark (#i-logo), scaled up 1:1 in absolute
+       coordinates rather than a nested transform, so stroke widths stay
+       predictable. One point of focus, radiating awareness. -->
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M512 210v130M512 684v130M210 512h130M684 512h130" stroke-width="58"/>
+    <path d="M300 300l92 92M632 632l92 92M724 300l-92 92M392 632l-92 92" stroke-width="50" opacity="0.6"/>
+  </g>
+  <circle cx="512" cy="512" r="50" fill="#ffffff"/>
+</svg>

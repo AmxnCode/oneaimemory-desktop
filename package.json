@@ -1,0 +1,78 @@
+{
+  "name": "@oneconscious/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OneAIMemory desktop collector (macOS)",
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "npm run build --prefix packages/shared && npm run build --prefix packages/memory && node build.mjs",
+    "//launch": "ELECTRON_RUN_AS_NODE is set inside Electron-based terminals (VS Code, Claude Code). Inherited, it makes the electron binary run as plain node and `require('electron')` returns the shim path instead of the API.",
+    "dev": "node build.mjs && env -u ELECTRON_RUN_AS_NODE electron .",
+    "start": "env -u ELECTRON_RUN_AS_NODE electron .",
+    "pack": "node build.mjs && electron-builder --dir",
+    "dist": "node build.mjs && electron-builder",
+    "dist:mac": "node build.mjs && electron-builder --mac",
+    "dist:win": "node build.mjs && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.oneaimemory.desktop",
+    "productName": "OneAIMemory",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/node_modules/@huggingface/transformers/**"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "assets/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    }
+  },
+  "dependencies": {
+    "@oneconscious/shared": "file:./packages/shared",
+    "@oneconscious/memory": "file:./packages/memory",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "electron": "43.2.0",
+    "electron-builder": "^26.0.12",
+    "esbuild": "^0.28.1"
+  }
+}
